@@ -1,0 +1,14 @@
+<svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="45" height="45" fill="#3E3E3D"/>
+<circle cx="23" cy="11" r="4" fill="#595857"/>
+<path d="M15 30H14V33H15V30Z" fill="#595857" stroke="#595857"/>
+<circle cx="12.5" cy="31.5" r="2.5" fill="#595857"/>
+<rect x="15" y="27.5" width="2" height="8" fill="#595857"/>
+<line x1="12.4004" y1="29.5" x2="15.1004" y2="29.5" stroke="#595857"/>
+<line x1="12.4004" y1="33.5" x2="15.1004" y2="33.5" stroke="#595857"/>
+<path d="M30 30H31V33H30V30Z" fill="#595857" stroke="#595857"/>
+<circle r="2.5" transform="matrix(-1 0 0 1 32.5 31.5)" fill="#595857"/>
+<rect width="2" height="8" transform="matrix(-1 0 0 1 30 27.5)" fill="#595857"/>
+<line y1="-0.5" x2="2.7" y2="-0.5" transform="matrix(-1 0 0 1 32.5996 30)" stroke="#595857"/>
+<line y1="-0.5" x2="2.7" y2="-0.5" transform="matrix(-1 0 0 1 32.5996 34)" stroke="#595857"/>
+</svg>

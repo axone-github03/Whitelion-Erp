@@ -1,0 +1,747 @@
+Task 1 :-
+-----------
+
+Admin login - login dashboard,add/delete/edit employee
+company admin - login dashboard,add/edit employee
+employee - dashboard login
+
+https://bagisto.com/en/how-to-create-multiple-role-based-authentication-in-laravel-application/
+https://kinsta.com/blog/laravel-crud/
+https://www.codexworld.com/laravel-tutorial-crud-add-edit-delete-operations/
+https://inspector.dev/how-to-create-custom-middleware-in-laravel/ - manage traffic middleware
+
+------------------------------------------------------
+
+"INCREASE XAMPP LIMIT
+
+post_max_size = 800M 
+upload_max_filesize = 800M 
+max_execution_time = 5000 
+max_input_time = 5000 
+memory_limit = 1000M 
+
+Xampp -> php -> windowsXamppPhp -> php.ini-development
+Xampp -> php -> windowsXamppPhp -> php.ini-production
+Xampp -> php -> php.ini-development
+Xampp -> php -> php.ini-production
+
+Xampp Control Panel In There ini File
+
+Note : 
+setExecTimeLimit In This Function Limit Set 5000
+Xampp -> phpMyAdmin -> libraries -> classes -> config -> setting.php"
+
+-----------------------------------------------------
+
+Datatables :-
+
+https://laracasts.com/discuss/channels/laravel/ajax-and-datatables - using cdn
+https://techsolutionstuff.com/post/laravel-8-ajax-crud-using-datatable - using composer package
+
+
+------------------------------------------------------------
+
+24/01/2024   Task 2:-
+
+Email id :- production@whitelion.in
+Password :- 111111
+
+- Add tag Colour In tag Master Add Column "tag_colour"
+============================
+  changes page :- resources->views->crm->setting->composite_item_tag.blade.php
+		  app->Http->Controllers->SettingController.php
+		  add_tag_colour_column_in_tag_master.php
+  view :- Production master -> Tag Master
+https://www.itsolutionstuff.com/post/how-to-use-bootstrap-colorpicker-example-codeexample.html
+
+- Composite tag Show In Item Detail Page
+=========================================
+ changes page :- resources->views->quotation->master->itemprice->comman->item_detail_tab.blade.php
+		  app->Http->Controllers->ProductionMaster->Quotation->ProdQuotItemPriceMasterController.php
+
+	item_detail_tab.blade.php
+-------------------------
+	    <div class="row">
+                <label for="" class="col-5">Item Tag</label>
+                <label for="" class="col-7 text-title">: {!! $ItemPrice['tag_names'] !!}</label>
+            </div>
+
+  	ProdQuotItemPriceMasterController.php -> function (getItemPriceDetail)
+---------------------------
+
+ 	 $ItemTagId = ProdWlmst_ItemPrice::select('item_tag')->where('id', $request->id)->first();
+            if ($ItemTagId) {
+                $tagIds = explode(',', $ItemTagId->item_tag);
+
+                // Fetch tag names based on the tag IDs
+                $tagNames = TagMaster::whereIn('id', $tagIds)->pluck('tagname')->toArray();
+                
+                $tagIds = explode(',', $ItemTagId->item_tag);
+
+                  // Fetch tag colour based on the tag IDs
+                $tagColors = TagMaster::whereIn('id', $tagIds)->pluck('tag_colour')->toArray();
+            } 
+         
+            $tagNamesHTML = '';
+            
+            foreach ($tagNames as $tagId => $tagName) {
+                $tag_colour = $tagColors[$tagId] ?? 'tag_colour';
+                $tagNamesHTML .= '<span class="badge badge-pill badge badge-soft-info text-white font-size-11 ms-2" style="background-color: ' . $tag_colour . '; height: fit-content;">' . $tagName . '</span>';
+            }
+            
+            $ItemPrice['tag_names'] = $tagNamesHTML;
+
+
+- Fix Scan Section In Work Order
+==========================================
+  view :- Work Order -> PickUp Material -> + 
+
+changes page :- resources->views->production_transaction->delivery_challan->index.blade.php
+reference :- Purchase Order, GRN
+   $(document).ready(function() {
+            adjustContainerHeight();
+            $(window).on('resize', adjustContainerHeight);
+        });
+
+        function adjustContainerHeight() {
+            var windowWidth = $(window).width();
+            if (windowWidth <= 1440) {
+                $('body').addClass('vertical-collpsed');
+            }
+            var windowHeight = $(window).height() - 218;
+            max_height = windowHeight - 70;
+            $('#pickup_row_material_item').parent().css('max-height', windowHeight + 'px');
+        }
+
+ <div id="pickup_row_material_item" style="overflow: scroll; max-height: 650px;">
+
+- planing only up arrow work for planning process (Progressbar)
+==================================================================
+
+- Add Item Tag Filter in Stock report
+================================================
+
+ changes page :- resources->views->production_report->stock_report_new->index.blade.php
+
+ <div class="mb-1 mt-lg-0 ajax-select col-4">
+     <label for="stock_report_item_tag_filter" class="mt-2">Item Tag</label>
+         <select class="form-control select2-ajax select2-multiple" multiple="multiple" id="stock_report_item_tag_filter" name="stock_report_item_tag_filter[]" required></select>
+            <div class="invalid-feedback">Please select item tag</div>
+       </div>
+
+ var ajaxURLSearchItemTag = '{{ route('quot.itemprice.search.itemtag') }}';
+
+   $("#stock_report_item_tag_filter").select2({
+            ajax: {
+                url: ajaxURLSearchItemTag,
+                dataType: 'json',
+                delay: 0,
+                data: function(params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function(data, params) {
+                    // parse the results into the format expected by Select2
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data, except to indicate that infinite
+                    // scrolling can be used
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: false
+            },
+            placeholder: 'Select Item Tag',
+            dropdownParent: $("#report_table_datas"),
+        }).on('change', function(e) {
+            reloadTable();
+        });
+
+
+	   "data": {
+                    "_token": csrfToken,
+                    "warehouse_id" : warehouse_id,
+                    "item_tag_id" : function() {
+                        return $('#stock_report_item_tag_filter').val()
+                    }
+                }
+
+--------------------------------------------------
+https://o7planning.org/12411/javascript-scrollbars
+https://codepen.io/MarkitDigital/post/mk-datepicker -date year month
+https://codepen.io/jacknlo/pen/rNNPrBX
+
+
+
+
+  $(document).ready(function () {
+            var date = new Date();
+
+            // Initialize Bootstrap Datepicker
+            $('#q_itemprice_master_month').datepicker({
+                format: 'M',
+                startView: 'months',
+                minViewMode: 'months',
+                autoclose: true,
+            }).datepicker('setDate', date);
+
+            $('#q_itemprice_master_year').val(date.getFullYear());
+        });
+
+find current year and month
+
+
+} else if (typeof codes === 'string') {
+        // Convert 'codes' to an array (split by space)
+        var codeArray = codes.split(/\s+/);
+        
+        // Add a placeholder option
+        codeDropdown.append($('<option>', {
+            value: '',
+            text: 'Select Code'
+        }));
+        
+        // Add options for each code in the array
+        codeArray.forEach(function (code) {
+            codeDropdown.append($('<option>', {
+                value: code,
+                text: code
+            }));
+        });
+    } else {
+        console.error('Invalid or missing codes array. Type:', typeof codes);
+    }
+
+----------------------------------------------------
+  function populateCodeDropdown(codes) {
+    var codeDropdown = $("#q_itemprice_composite_id");
+    codeDropdown.empty();
+
+    // Check if 'codes' is an array
+    if (Array.isArray(codes)) {
+        // Add a placeholder option
+        codeDropdown.append($('<option>', {
+            value: '',
+            text: 'Select Code'
+        }));
+
+        // Add options for each code in the array
+        codes.forEach(function (code) {
+            codeDropdown.append($('<option>', {
+                value: code,
+                text: code
+            }));
+        });
+
+        // Trigger change event to update Select2
+        codeDropdown.trigger('change');
+    } else {
+        console.error('Invalid or missing codes array. Codes:', codes);
+    }
+}
+
+
+----------------------------------------
+$("#q_itemprice_item_id").select2({
+            ajax: {
+                url: ajaxURLSearchItem, // Replace with your URL for searching items
+                dataType: 'json',
+                delay: 0,
+                data: function(params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: false
+            },
+            placeholder: 'Select Item',
+            dropdownParent: $("#canvasMainMaster"),
+        }).on('change', function(e) {
+            if ($(this).val() != '' && $(this).val() != null) {
+                if (Is_item_edit == 0) {
+                    $.ajax({
+                        type: 'POST',
+                        url: ajaxURLItemDetail,
+                        data: {
+                            "_token": csrfToken,
+                            "item_id": $(this).val(),
+                        },
+                        success: function(resultData) {
+                            if (resultData['status'] == 1) {
+                                var Item_Type = resultData['data']['item_type'];
+                                $("#q_itemprice_prod_item_type").val(Item_Type['text']);
+                                $("#q_itemprice_prod_item_type_id").val(Item_Type['id']);
+                                
+                                populateCodeDropdown(resultData['data']['codes']);
+                            } else {
+                                // toastr["error"]('Please Refresh Page');
+                            }
+
+                        }
+                    });
+                } else {
+                    Is_item_edit = 0;
+                }
+            }
+        });
+
+
+function populateCodeDropdown(codes) {
+    var codeDropdown = $("#q_itemprice_composite_id");
+    codeDropdown.empty();
+
+    if (Array.isArray(codes)) {
+        // 'codes' is already an array
+        codes.forEach(function (code) {
+            codeDropdown.append($('<option>', {
+                value: code,
+                text: code
+            }));
+        });
+    } else if (codes) {
+    var codeArray;
+
+    if (Array.isArray(codes)) {
+        // 'codes' is already an array
+        codeArray = codes;
+    } else {
+        // Convert 'codes' to an array with a single value
+        codeArray = [codes];
+    }
+
+    // Add a placeholder option
+    codeDropdown.append($('<option>', {
+        value: '',
+        text: 'Select Code'
+    }));
+
+    // Add options for each code in the array
+    codeArray.forEach(function (code) {
+        codeDropdown.append($('<option>', {
+            value: code,
+            text: code
+        }));
+    });
+} else {
+    console.error('Invalid or missing codes. Type:', typeof codes);
+}
+
+    // Trigger change event to update Select2
+    codeDropdown.trigger('change');
+    codeDropdown.select2();
+
+}
+
+
+
+
+public function searchItem(Request $request)
+    {
+        $GroupList = array();
+        $GroupList = ProdWlmstItem::query();
+        // $GroupList = ProdWlmstItem::selectRaw('CONCAT(prod_wlmst_items.itemname, " - ", prod_wlmst_item_categories.itemcategoryname) AS text,prod_wlmst_items.id');
+        // $GroupList->leftJoin('prod_wlmst_item_categories', 'prod_wlmst_item_categories.id', '=', 'prod_wlmst_items.itemcategory_id');
+
+        $GroupList->where('isactive', 1);
+        if (isset($request->q)) {
+            $GroupList->where('prod_wlmst_items.itemname', 'like', "%" . $request->q . "%");
+        }
+        $GroupList->limit(15);
+        $GroupList = $GroupList->get();
+
+        foreach ($GroupList as $key => $value) {
+            $GroupList[$key]['id'] = $value->id;
+            $ItemName = $value->itemname;
+            $Category = ProdWlmstItemCategory::find($value->itemcategory_id);
+            if ($Category) {
+                $ItemName .= " - ".$Category->itemcategoryname;
+            }
+            $ItemName .= " - ".getItemType()[$value->prod_item_type]['text'];
+            // dd($ItemName);
+            $GroupList[$key]['text'] = $ItemName;
+        }
+
+        $response = array();
+        $response['results'] = $GroupList;
+        $response['pagination']['more'] = false;
+        return response()->json($response)->header('Content-Type', 'application/json');
+    }
+
+-------------------------------------------------------------------------------------
+*Date : {date}*
+
+*--: {Project Name} :--*
+*-* {Task Detail} *{Task Status}*
+
+Example :
+*Date : 07-03-2024*
+
+*--: Whitelion Sales Erp :--*
+*-* Change All Master Password *Complete*
+*-* Change All Master Password *On Working*
+*-* Change All Master Password *Pending*
+-------------------------------------------------------------------------------------
+backup: - marketing lead sync
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Lead;
+use App\Models\LeadSource;
+use App\Models\LeadContact;
+use Illuminate\Http\Request;
+use App\Models\MarketingLeadSync;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use App\Http\Controllers\Whatsapp\WhatsappApiContoller;
+use DB;
+
+
+class MarketingLeadController extends Controller
+{
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+
+            $tabCanAccessBy = array(0, 1, 777);
+
+            if (!in_array(Auth::user()->type, $tabCanAccessBy)) {
+                return redirect()->route('dashboard');
+            }
+            return $next($request);
+        });
+    }
+
+    public function index()
+    {
+        $data = array();
+        $data['title'] = "Marketing Lead";
+        return view('marketing_lead/index', compact('data'));
+    }
+
+    public function ajax(Request $request)
+    {
+        $searchColumns = array(
+            0 => 'marketing_lead_sync.id',
+            1 => 'marketing_lead_sync.email',
+            2 => 'marketing_lead_sync.full_name',
+            3 => 'marketing_lead_sync.phone_number',
+            4 => 'marketing_lead_sync.city',
+            5 => 'marketing_lead_sync.platform',
+        );
+
+        $sortingColumns = array(
+            0 => 'marketing_lead_sync.id',
+            1 => 'marketing_lead_sync.email',
+            2 => 'marketing_lead_sync.full_name',
+            3 => 'marketing_lead_sync.phone_number',
+            4 => 'marketing_lead_sync.city',
+            5 => 'marketing_lead_sync.platform',
+            6 => 'marketing_lead_sync.status',
+            7 => 'marketing_lead_sync.remark',
+            8 => 'marketing_lead_sync.source_type',
+            9 => 'marketing_lead_sync.sub_source',
+            10 => 'marketing_lead_sync.source',
+            11 => 'marketing_lead_sync.assign_to',
+            12 => 'marketing_lead_sync.lead_id',
+            13 => 'marketing_lead_sync.date',
+        );
+        
+        
+        $query = MarketingLeadSync::query();
+        $query->where('marketing_lead_sync.status', '!=', 1);
+
+        $recordsTotal = $query->count();
+    
+        if (isset($request['search']['value'])) {
+            $search_value = $request['search']['value'];
+            $query->where(function ($query) use ($search_value, $searchColumns) {
+                for ($i = 0; $i < count($searchColumns); $i++) {
+                    if ($i == 0) {
+                        $query->where($searchColumns[$i], 'like', "%" . $search_value . "%");
+                    } else {
+                        $query->orWhere($searchColumns[$i], 'like', "%" . $search_value . "%");
+                    }
+                }
+            });
+        }
+        $query->where('marketing_lead_sync.status', '!=', 1);
+        $recordsFiltered = $query->count();
+    
+        $query->orderBy($sortingColumns[$request['order'][0]['column']], $request['order'][0]['dir']);
+        $query->offset($request->start);
+        $query->limit($request->length);
+    
+        $data = $query->get();
+    
+        $viewData = array();
+        foreach ($data as $key => $value) {
+            $viewData[$key]['id'] = '<div class="avatar-xs"><span class="avatar-title rounded-circle">' . $value['id'] . '</span></div>';
+            $viewData[$key]['date'] = '<p class="text-muted mb-0">' . $value['date'] .'</p>';
+            $viewData[$key]['email'] = '<p class="text-muted mb-0">' . $value['email'] .'</p>';
+            $viewData[$key]['full_name'] = '<p class="text-muted mb-0">' . $value['full_name'] .'</p>';
+            $viewData[$key]['phone_number'] = '<p class="text-muted mb-0">' . $value['phone_number'] .'</p>';
+            $viewData[$key]['city'] = '<p class="text-muted mb-0">' . $value['city'] .'</p>';
+            $viewData[$key]['platform'] = '<p class="text-muted mb-0">' . $value['platform'] .'</p>';
+            $viewData[$key]['source_type'] = '<p class="text-muted mb-0">' . $value['source_type'] .'</p>';
+            $viewData[$key]['sub_source'] = '<p class="text-muted mb-0">' . $value['sub_source'] .'</p>';
+            $viewData[$key]['source'] = '<p class="text-muted mb-0">' . $value['source'] .'</p>';
+            $viewData[$key]['assign_to'] = '<p class="text-muted mb-0">' . $value['assign_to'] .'</p>';
+            $viewData[$key]['lead_id'] = '<p class="text-muted mb-0">' . $value['lead_id'] .'</p>';
+            $viewData[$key]['status'] = marketingLeadStatus($value['status']);
+            $statusClass = "";
+
+			if ($value['status'] == 0) {
+				$statusClass = 'badge-soft-warning ';
+			} else if ($value['status'] == 1) {
+				$statusClass = 'badge-soft-success ';
+			} else if ($value['status'] == 2) {
+				$statusClass = 'badge-soft-danger ';
+			} else {
+				$statusClass = 'badge-soft-warning ';
+			}
+
+			$viewData[$key]['status'] = '<span class="badge ' . $statusClass . ' badge-pill badgefont-size-11">' . $viewData[$key]['status'] . '</span>';
+            $viewData[$key]['remark'] = '<p class="text-muted mb-0">' . $value['remark'] .'</p>';
+        }
+    
+        // Build the response array
+        $jsonData = array(
+            "draw" => intval($request['draw']),
+            "recordsTotal" => intval($recordsTotal),
+            "recordsFiltered" => intval($recordsFiltered),
+            "data" => $viewData,
+        );
+    
+        return $jsonData;
+    }
+
+    public function save(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'q_marketing_lead_excel' => ['required'],
+        ]);
+        if ($validator->fails()) {
+
+            $response = array();
+            $response['status'] = 0;
+            $response['msg'] = "The request could not be understood by the server due to malformed syntax";
+            $response['statuscode'] = 400;
+            $response['data'] = $validator->errors();
+
+            return response()->json($response)->header('Content-Type', 'application/json');
+        } else {
+            $the_file = $request->file('q_marketing_lead_excel');
+            try {
+                $spreadsheet = IOFactory::load($the_file->getRealPath());
+                $sheet        = $spreadsheet->getActiveSheet();
+                $row_limit    = $sheet->getHighestDataRow();
+                $row_range    = range(2, $row_limit);
+                $data = array();
+                foreach ($row_range as $row) {
+                    $ItemPriceMaster = new MarketingLeadSync();
+                    $ItemPriceMaster->date = $sheet->getCell('A' . $row)->getValue();
+                    $ItemPriceMaster->platform = $sheet->getCell('B' . $row)->getValue();
+                    $ItemPriceMaster->how_soon_are_you_considering_to_automate_your_house = $sheet->getCell('C' . $row)->getValue();
+                    $ItemPriceMaster->how_many_bedrooms_does_your_apartment_have = $sheet->getCell('D' . $row)->getValue();
+                    $ItemPriceMaster->email = $sheet->getCell('E' . $row)->getValue();
+                    $ItemPriceMaster->full_name = $sheet->getCell('F' . $row)->getValue();
+                    $rawPhoneNumber = $sheet->getCell('G' . $row)->getValue();
+                    $ItemPriceMaster->phone_number = str_replace(['p:+91', 'p:'], '', $rawPhoneNumber);
+                    
+                    $ItemPriceMaster->city = $sheet->getCell('H' . $row)->getValue();
+
+                    $ItemPriceMaster->telesales_team_remark= $sheet->getCell('I' . $row)->getValue();
+                    $ItemPriceMaster->sales_team_remark= $sheet->getCell('M' . $row)->getValue();
+                    $ItemPriceMaster->recorde_id = $sheet->getCell('R' . $row)->getValue();
+                    
+                    $ItemPriceMaster->source_type = $sheet->getCell('S' . $row)->getValue();
+                    $ItemPriceMaster->sub_source = $sheet->getCell('T' . $row)->getValue();
+                    $ItemPriceMaster->source = $sheet->getCell('U' . $row)->getValue();
+                    $ItemPriceMaster->assign_to = $sheet->getCell('V' . $row)->getValue();
+                    $ItemPriceMaster->entryby = Auth::user()->id;
+                    $ItemPriceMaster->entryip = $request->ip();
+
+                    if (empty($ItemPriceMaster->full_name)) {
+                        continue; 
+                    }
+
+                    if (MarketingLeadSync::where('email', $ItemPriceMaster->email)->exists()) {
+                        $errorMessage = 'Error: Email ID ' . $ItemPriceMaster->email . ' already exists.';
+                        continue;
+                    }
+                    if (Lead::where('phone_number', $ItemPriceMaster->phone_number)->exists()) {
+                        $errorMessage = 'Error: Phone number ' . $ItemPriceMaster->phone_number . ' already exists.';
+                        continue;
+                    }  
+ 
+                    $full_name = $ItemPriceMaster->full_name;
+                    $name_parts = explode(' ', $full_name, 2);
+                    $lead = new Lead();
+                    $lead['first_name'] = $name_parts[0] ?? '';
+                    $lead['last_name'] = $name_parts[1] ?? '';
+                    $lead['email'] = $ItemPriceMaster->email;
+                    $lead['customer_id'] = 0;
+                    $lead['phone_number'] = $ItemPriceMaster->phone_number;
+                    if($ItemPriceMaster->assign_to == 'Farhad'){
+                        $lead['assigned_to'] = 5695;
+                    }else{
+                        $lead['assigned_to'] = 3566;
+                    }
+                    $lead['status'] = 1;
+                    $lead['sub_status'] = 0;
+                    $lead['created_by'] = Auth::user()->id;
+                    $lead['updated_by'] = Auth::user()->id;
+                    $lead['user_id'] = Auth::user()->id;
+                    
+                    if($ItemPriceMaster->platform == 'fb'){
+                        $lead['source_type'] = 'textnotrequired-1';
+                        $ItemPriceMaster->platform = 'facebook';
+                    }else if($ItemPriceMaster->platform == 'ig'){
+                        $lead['source_type'] = 'textnotrequired-11';
+                        $ItemPriceMaster->platform = 'instagram'; 
+                    }else if($ItemPriceMaster->platform == 'googleads'){
+                        $lead['source_type'] = 'textnotrequired-12';
+                        $ItemPriceMaster->platform = 'Google Ads'; 
+                    }else{
+                        $lead['source_type'] = '';
+                        $ItemPriceMaster->platform = '';
+                    }
+                    
+                    $lead['source'] = $ItemPriceMaster->platform;
+
+                    $lead->is_deal = 0;
+                    $lead->save();
+                    
+                    $response_error = array();
+                    if ($lead) {
+                            
+                        try {
+                            $timeline = array();
+                            $timeline['lead_id'] = $lead->id;
+                            $timeline['type'] = "lead-generate";
+                            $timeline['reffrance_id'] = $lead->id;
+                            $timeline['description'] = "Lead created by " . Auth::user()->first_name . " " . Auth::user()->last_name;
+                            $timeline['source'] = "WEB";
+                            saveLeadTimeline($timeline);
+
+                            $LeadContact = new LeadContact();
+                            $LeadContact->lead_id = $lead->id;
+                            $LeadContact->contact_tag_id = 1;
+                            $LeadContact->first_name = $lead->first_name;
+                            $LeadContact->last_name = $lead->last_name;
+                            $LeadContact->phone_number = $lead->phone_number;
+                            $LeadContact->alernate_phone_number = 0;
+                            $LeadContact->email = $lead->email;
+                            $LeadContact->type = 0;
+                            $LeadContact->type_detail = 0;
+                            $LeadContact->save();
+
+                            $LeadSource1 = new LeadSource();
+                            $LeadSource1->lead_id = $lead->id;
+                            $LeadSource1->source_type = $lead['source_type'];
+                            $LeadSource1->source = $lead['source'];
+                            $LeadSource1->is_main = 1;
+                            $LeadSource1->save();
+                        
+                            $response = successRes("Successfully saved lead");
+                            $response['id'] = $lead->id;
+                        } catch (\Exception $e) {
+                            $response = errorRes($e->getMessage(), 400);
+                        }
+                    } else {
+                        $response = errorRes("Lead Not Saved", 400);
+                    }
+
+                    $response['error'] = $response_error;
+
+                    $ItemPriceMaster->lead_id = $lead->id;
+                    $ItemPriceMaster->status = 1;
+                    $ItemPriceMaster->remark = 'Successfully Lead Generated';
+                    $ItemPriceMaster->save();
+                }
+                // if (isset($errorMessage)) {
+                //     $response = errorRes($errorMessage);
+                //     return redirect()->route('crm.marketing.lead');
+                // } else {
+                    $response = successRes('Data Imported Successfully');
+                    return redirect()->route('crm.marketing.lead');
+                // }
+            } catch (Exception $e) {
+                $response = errorRes($e->getMessage());
+                return response()->json($response)->header('Content-Type', 'application/json');
+            }
+        }
+    }
+}
+
+----------------------------------------------------------------------------------
+lost_lead.blade.php
+@if(isset($params['transaction_data']) && is_array($params['transaction_data']))
+    @if($params['transaction_data']['is_deal'] == 1)
+        <h1>#D{{$params['transaction_data']['id']}}</h1>
+    @else 
+        <h1>#L{{$params['transaction_data']['id']}}</h1>
+    @endif
+
+    <p>Client Name: {{$params['transaction_data']['first_name']}}  {{$params['transaction_data']['last_name']}}</p>
+    <p>Lead Owner: {{$params['transaction_data']['lead_owner']}}</p>
+    <p>Lead Source Type: {{$params['transaction_data']['source_type']}}</p>
+    <p>Lead Source: {{$params['transaction_data']['source']}}</p>
+    <p>Client Address: <br>{{$params['transaction_data']['house_no']}} - {{$params['transaction_data']['addressline1']}}, <br>
+        {{$params['transaction_data']['addressline2']}}, {{$params['transaction_data']['area']}}<br>
+        {{$params['transaction_data']['pincode']}} - {{$params['transaction_data']['city']['city_list_name']}}, <br>
+        {{$params['transaction_data']['city']['state_list_name']}}, {{$params['transaction_data']['city']['country_list_name']}}</p>
+    <h3>Quotation Amount: INR. {{$params['transaction_data']['quotation_amt']}} /-</h3>
+@else
+    <!-- Handle case where $params['transaction_data'] is not set or not an array -->
+    <p>Error: Transaction data is not available.</p>
+@endif
+
+
+-------------------------------------------------------------------------------------
+Live server URL :-
+
+Database - http://103.218.110.153:242/phpmyadmin/
+Inventory Management - http://103.218.110.153:242/Inventory_Management/public/
+
+
+url :- http://192.168.0.143:242/Whitelion-Erp/public
+username :- sales@whitelion.in
+password :- Ankit#2002
+
+
+url :- http://192.168.0.143:242/WlProductionErp/public/
+username :- production@whitelion.in
+password :- Ankit#2002
+
+
+https://whitelioninc.monday.com/boards/3117119173/views/71098469
+User : vipul@axoneinfotech.com
+Pass : Vipul@67187
+
+
+https://www.diffchecker.com/b1a8mfhe/
